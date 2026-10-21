@@ -1,0 +1,24 @@
+heading	Avaliação de um leitor automático de PDF para português brasileiro
+para	Resumo — Este trabalho avalia a extração de texto de documentos em PDF para fins de leitura em voz alta. São considerados três tipos de documento: romance comercial, divulgação científica e artigo em duas colunas. A métrica adotada é a taxa de erro de caractere em relação ao texto de origem.
+heading	1. Introdução
+para	A conversão de PDF para texto contínuo é tratada com frequência como um problema resolvido, o que não corresponde à prática [1]. Documentos diagramados em duas colunas, com cabeçalho corrente e notas de rodapé, produzem sequências de linhas cuja ordem de leitura não é a ordem em que aparecem no arquivo [2], [3].
+para	Silva et al. (2020) demonstraram que a taxa de erro cresce com o número de elementos flutuantes na página. O presente trabalho reproduz esse resultado e acrescenta uma análise por tipo de defeito.
+heading	2. Método
+para	Foram gerados documentos sintéticos a partir de um texto de origem conhecido, o que permite medir o erro sem anotação manual. Cada documento recebeu uma diagramação distinta, mantendo o conteúdo constante.
+para	A extração foi executada no próprio dispositivo de destino, um aparelho Android, com a mesma biblioteca usada em produção, de modo que o resultado medido é o resultado entregue ao usuário.
+heading	3. Resultados
+para	A taxa de erro de caractere ficou abaixo de 1% para o romance e para a divulgação científica, e acima desse valor para o artigo em duas colunas, concentrada nas transições entre colunas.
+para	O corpus é composto por documentos gerados automaticamente, de modo que o texto de origem permanece disponível para comparação. Essa escolha elimina a necessidade de anotação humana e torna o experimento reprodutível por terceiros, bastando executar o gerador.
+para	Cada documento foi diagramado com os elementos que a literatura aponta como causadores de erro: cabeçalho corrente alternando entre páginas pares e ímpares, numeração de página, capitular no início de capítulo, quebra de cena sinalizada por asteriscos e hifenização no fim de linha.
+para	A comparação entre o texto extraído e o texto de origem foi feita bloco a bloco, com alinhamento por distância de edição. Um bloco é considerado perdido quando não encontra correspondente com similaridade superior a oitenta por cento.
+heading	4. Discussão
+para	Os erros observados concentram-se em três categorias. A primeira é a fusão de blocos distintos num único parágrafo, que ocorre quando o cabeçalho corrente não é removido antes da montagem e acaba inserido entre duas linhas de texto corrido.
+para	A segunda categoria é a perda da primeira letra de um capítulo, causada pela capitular, que o extrator interpreta como um elemento gráfico independente por estar em corpo muito maior que o restante da linha.
+para	A terceira é a inversão da ordem de leitura em documentos de duas colunas, na qual linhas da coluna da direita são intercaladas com linhas da coluna da esquerda, produzindo um texto sintaticamente impossível.
+para	Nenhuma das três categorias exige aprendizado de máquina para ser corrigida. Todas dependem de informação geométrica já disponível no arquivo, desde que o extrator a preserve em vez de descartá-la ao concatenar as linhas.
+heading	5. Conclusão
+para	A extração de texto para leitura em voz alta exige critérios mais rigorosos do que a extração para indexação. Um erro que passa despercebido numa busca textual torna-se imediatamente audível quando o texto é pronunciado, e por isso a métrica adotada penaliza igualmente supressões e inserções.
+heading	Referências
+para	[1] A. Pereira, “Extração de texto em documentos digitalizados”, Revista Brasileira de Computação, v. 12, n. 3, p. 45-61, 2019.
+para	[2] M. Souza e R. Lima, “Ordem de leitura em documentos multicoluna”, Anais do Simpósio de Documentos Digitais, p. 112-120, 2021.
+para	[3] J. Silva, C. Costa e F. Dias, “Layout analysis revisited”, Journal of Document Engineering, v. 8, p. 1-17, 2020.

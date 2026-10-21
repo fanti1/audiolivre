@@ -1,0 +1,182 @@
+<title>O narrador de terror</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --surface: #fffcf7;
+    --ink: #231c17;
+    --muted: #6d6259;
+    --line: #e2d7c8;
+    --accent: #8e2a22;
+    --accent-dim: #f1dcd6;
+    --shadow: 0 1px 2px rgba(50, 30, 20, .07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141110;
+      --surface: #1d1917;
+      --ink: #f0e8e0;
+      --muted: #a09387;
+      --line: #342c27;
+      --accent: #e0735f;
+      --accent-dim: #3b221d;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141110;
+    --surface: #1d1917;
+    --ink: #f0e8e0;
+    --muted: #a09387;
+    --line: #342c27;
+    --accent: #e0735f;
+    --accent-dim: #3b221d;
+    --shadow: none;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Literata, Georgia, serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 44rem; margin: 0 auto; padding-inline: 18px; padding-block: 3rem 5rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 1rem;
+  }
+  h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.1; margin: 0 0 1rem; text-wrap: balance; }
+  .lead { color: var(--muted); font-size: 1.08rem; margin: 0 0 2.6rem; }
+  .lead strong { color: var(--ink); }
+
+  .cards { display: flex; flex-direction: column; gap: 1.4rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 1.1rem 1.15rem 1.2rem; box-shadow: var(--shadow);
+  }
+  .card h2 { font-size: 1.12rem; margin: 0 0 .15rem; text-wrap: balance; }
+  .note { color: var(--muted); font-size: .88rem; margin: 0 0 .85rem; }
+  .printed {
+    font-style: italic; border-left: 2px solid var(--accent);
+    padding: .1rem 0 .1rem .8rem; margin: 0 0 1rem; font-size: 1rem;
+  }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+  @media (max-width: 560px) { .pair { grid-template-columns: 1fr; } }
+  .take {
+    border: 1px solid var(--line); border-radius: 10px; padding: .7rem .8rem;
+    display: grid; grid-template-columns: auto 1fr; gap: .2rem .7rem; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .take.after { border-color: var(--accent); background: var(--accent-dim); }
+  .take .label {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .7rem;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  }
+  .take.after .label { color: var(--accent); }
+  .take .said {
+    grid-column: 1 / -1; font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .76rem; color: var(--muted); line-height: 1.45; word-break: break-word;
+  }
+  .take .secs { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .74rem; color: var(--muted); }
+  .play {
+    width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink); cursor: pointer; font-size: .9rem;
+    display: grid; place-items: center; grid-row: span 2;
+  }
+  .take.after .play { border-color: var(--accent); }
+  .take.playing .play { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .play:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; background: var(--accent); }
+
+  .foot { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1.2rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Audiolivre · terror e suspense</p>
+  <h1>O narrador de terror</h1>
+  <p class="lead">Grito, sussurro, rosnado e gagueira são o que o reconhecimento de fala mais erra ao julgar, então quem decide aqui é <strong>o seu ouvido</strong>. Os trechos foram escritos por mim no estilo do gênero; cada um é lido pelo Faber do jeito que o app lê: segmento por segmento, com as pausas do app.</p>
+  <div class="cards" id="cards"></div>
+  <p class="foot">Embaixo de cada gravação está o texto exatamente como foi enviado à voz. “Antes” é como o app lia até ontem; “Depois” é esta versão.</p>
+</div>
+
+<script>
+  const DATA = /*DATA*/null;
+  const audio = new Audio();
+  let current = null;
+
+  function stop() {
+    audio.pause();
+    if (current) {
+      current.take.classList.remove('playing');
+      current.btn.textContent = '▶';
+      current.bar.style.width = '0';
+    }
+    current = null;
+  }
+  audio.addEventListener('timeupdate', () => {
+    if (current && audio.duration) current.bar.style.width = (audio.currentTime / audio.duration * 100) + '%';
+  });
+  audio.addEventListener('ended', stop);
+
+  function take(kind, label, src, said, secs) {
+    const el = document.createElement('div');
+    el.className = 'take ' + kind;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'play';
+    btn.textContent = '▶';
+    btn.setAttribute('aria-label', 'Ouvir ' + label);
+    const lab = document.createElement('span');
+    lab.className = 'label';
+    lab.textContent = label;
+    const s = document.createElement('span');
+    s.className = 'secs';
+    s.textContent = String(secs).replace('.', ',') + ' s';
+    const t = document.createElement('div');
+    t.className = 'said';
+    t.textContent = said;
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    el.append(btn, lab, s, t, bar);
+    btn.addEventListener('click', () => {
+      const same = current && current.take === el;
+      stop();
+      if (same) return;
+      current = { take: el, btn, bar };
+      el.classList.add('playing');
+      btn.textContent = '■';
+      audio.src = src;
+      audio.play().catch(stop);
+    });
+    return el;
+  }
+
+  const root = document.getElementById('cards');
+  DATA.forEach(c => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    const h = document.createElement('h2');
+    h.textContent = c.title;
+    const n = document.createElement('p');
+    n.className = 'note';
+    n.textContent = c.note;
+    const p = document.createElement('p');
+    p.className = 'printed';
+    p.textContent = c.printed;
+    const pair = document.createElement('div');
+    pair.className = 'pair';
+    pair.append(
+      take('before', 'Antes', c.before, c.before_text, c.before_s),
+      take('after', 'Depois', c.after, c.after_text, c.after_s),
+    );
+    card.append(h, n, p, pair);
+    root.appendChild(card);
+  });
+</script>

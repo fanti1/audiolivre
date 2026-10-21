@@ -1,0 +1,12 @@
+heading	3. Como o cérebro mede o tempo
+para	Não existe no cérebro humano um relógio único. O que existe é um conjunto de circuitos que estimam a passagem do tempo em escalas diferentes, de milissegundos a horas, e que discordam entre si com uma frequência desconfortável para quem gosta de explicações simples.
+para	A escala mais curta, medida em dezenas de milissegundos, é a que permite entender a fala. Quando alguém pronuncia as palavras “pato” e “bato”, a diferença física entre as duas está num intervalo de cerca de 20 ms no início da consoante.
+heading	3.1 O núcleo supraquiasmático
+para	O relógio circadiano fica num aglomerado de aproximadamente 20 mil neurônios no hipotálamo, o núcleo supraquiasmático. Ele funciona mesmo quando isolado do corpo, num prato de cultura, o que levou décadas para ser aceito.
+para	• a estimativa de intervalos curtos, abaixo de um segundo;
+para	• a estimativa de intervalos médios, de segundos a minutos;
+para	• o ciclo circadiano, de cerca de 24 horas.
+para	Essas três escalas usam mecanismos distintos, e uma lesão que destrói uma delas costuma poupar as outras duas.
+para	Figura 3.1 — Registro da atividade elétrica de um único neurônio do núcleo supraquiasmático ao longo de 48 horas.
+para	O resultado prático é que a sensação de que o tempo passou depressa ou devagar não é uma ilusão isolada: é o desacordo entre dois sistemas que mediram a mesma duração e chegaram a números diferentes.
+para	Em pacientes com lesão no cerebelo, o erro na estimativa de intervalos curtos chega a 40%.

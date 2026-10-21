@@ -1,0 +1,32 @@
+# Android Studio / Gradle
+*.iml
+.gradle/
+.idea/
+.kotlin/
+/build
+app/build/
+/captures
+.externalNativeBuild
+.cxx
+
+# Machine-specific: SDK path and the release signing key, which must never be published.
+local.properties
+keystore.properties
+*.jks
+*.keystore
+
+# Python (qa/ and bakeoff/)
+__pycache__/
+*.pyc
+.venv/
+
+# Generated audio from the voice comparisons in bakeoff/
+bakeoff/out/
+qa/out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Translation engine sources, downloaded by app/src/main/cpp/fetch_third_party.sh
+app/src/main/cpp/third_party/

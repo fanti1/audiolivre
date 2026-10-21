@@ -1,0 +1,12 @@
+# Keep line endings as they are in the repository (LF), whatever the cloner's core.autocrlf says:
+# shell scripts with CRLF break in bash, and a PDF with rewritten line endings is a broken PDF.
+* text=auto eol=lf
+*.bat text eol=crlf
+
+*.pdf binary
+*.png binary
+*.ogg binary
+*.ttf binary
+*.otf binary
+*.jar binary
+*.so binary

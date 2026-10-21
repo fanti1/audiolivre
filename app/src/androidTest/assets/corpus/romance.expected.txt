@@ -1,0 +1,31 @@
+heading	Capítulo 1
+heading	A casa da esquina
+para	Marina chegou à casa da esquina pouco depois das sete da noite, quando a rua já tinha esvaziado e as janelas dos vizinhos começavam a acender uma a uma. Levava na mão um envelope amassado que não abrira desde a manhã, e a certeza incômoda de que alguém a observava desde o portão.
+para	A porta estava encostada. Empurrou-a com a ponta dos dedos e esperou, contando até dez, antes de entrar. O corredor cheirava a poeira e a alguma coisa doce que não soube nomear.
+para	— Tem alguém aí? — perguntou ela.
+para	Ninguém respondeu. O silêncio tinha textura, como se a casa inteira estivesse prendendo a respiração junto com ela.
+para	— Você demorou, disse Rafael, saindo da sombra da escada.
+para	— Você me assustou. — Marina encostou-se na parede. — Podia ter acendido a luz.
+para	— A luz está cortada desde terça-feira. Vieram cortar às oito da manhã, e eu não estava em casa para discutir.
+para	— Que é? perguntou-lhe ela, apontando o envelope.
+para	— A conta. Mil quinhentos e trinta reais, e eles querem tudo até o dia 15.
+scene	* * *
+para	Passaram o resto da noite na cozinha, com uma vela entre os dois e o envelope aberto sobre a mesa. Rafael leu o documento três vezes antes de admitir que não entendia metade dos termos.
+para	— Precisamos de um advogado — murmurou ele.
+para	— Precisamos de dinheiro — corrigiu Marina. — O advogado vem depois.
+para	Do lado de fora, um cachorro latiu duas vezes e parou. Eram quase 23h30 quando a vela se apagou sozinha, sem vento nenhum que justificasse, e os dois ficaram no escuro sem dizer nada.
+heading	Capítulo 2
+heading	O que o Sr. Almeida sabia
+para	O escritório do Sr. Almeida ficava no segundo andar de um prédio sem elevador, entre uma costureira e um consultório odontológico que fechara havia anos. Marina subiu os degraus devagar, incomodada com o barulho dos próprios sapatos.
+para	— A senhora é a filha do Joaquim? — perguntou a secretária, sem levantar os olhos.
+para	— Sou a sobrinha.
+para	— Dá no mesmo. Ele está esperando desde as duas.
+para	Almeida era um homem pequeno, de óculos redondos, que falava como se estivesse sempre concluindo um raciocínio começado antes da chegada do interlocutor. Apontou a cadeira sem cumprimentar.
+para	— A senhora sabe o que é uma escritura de doação em vida? — disse ele. — Porque o seu tio sabia, e fez questão de assinar uma, em 1998, na presença de duas testemunhas.
+para	— Ninguém nunca me falou disso.
+para	— Ninguém tinha motivo para falar. — Almeida abriu uma gaveta. — Até agora.
+scene	* * *
+para	Marina saiu do prédio com a cópia na bolsa e a sensação de ter entrado numa história que já estava sendo contada havia muito tempo, sem ela. Atravessou a praça, comprou um café na esquina e telefonou para Rafael três vezes antes de ele atender.
+para	— Ele confirmou tudo — disse ela.
+para	— Tudo mesmo?
+para	— Tudo. E tem mais coisa que ele não quis dizer por telefone.

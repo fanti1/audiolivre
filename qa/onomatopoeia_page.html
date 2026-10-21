@@ -1,0 +1,120 @@
+<title>Catálogo de onomatopeias</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --surface: #fffcf7;
+    --ink: #231c17;
+    --muted: #6d6259;
+    --line: #e2d7c8;
+    --accent: #8e2a22;
+    --accent-dim: #f1dcd6;
+    --shadow: 0 1px 2px rgba(50, 30, 20, .07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141110; --surface: #1d1917; --ink: #f0e8e0; --muted: #a09387;
+      --line: #342c27; --accent: #e0735f; --accent-dim: #3b221d; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141110; --surface: #1d1917; --ink: #f0e8e0; --muted: #a09387;
+    --line: #342c27; --accent: #e0735f; --accent-dim: #3b221d; --shadow: none;
+  }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Literata, Georgia, serif; font-size: 17px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding-inline: 18px; padding-block: 3rem 5rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .72rem;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 1rem;
+  }
+  h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.1; margin: 0 0 1rem; text-wrap: balance; }
+  .lead { color: var(--muted); font-size: 1.05rem; margin: 0 0 2.4rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .8rem; text-wrap: balance; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr)); gap: .55rem; }
+  .item {
+    display: grid; grid-template-columns: auto 1fr; gap: .1rem .7rem; align-items: center;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: .6rem .75rem; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .item.playing { border-color: var(--accent); }
+  .play {
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); cursor: pointer; font-size: .85rem;
+    display: grid; place-items: center; grid-row: span 2;
+  }
+  .item.playing .play { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .play:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .written { font-weight: 600; font-size: 1.02rem; }
+  .spoken { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .76rem; color: var(--muted); }
+  .spoken b { color: var(--accent); font-weight: 600; }
+  .bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; background: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Audiolivre · módulo de onomatopeias</p>
+  <h1>Catálogo de onomatopeias</h1>
+  <p class="lead">Cada som como aparece no livro e como o narrador o diz, gravado no Faber. Toque para ouvir.</p>
+  <div id="groups"></div>
+</div>
+
+<script>
+  const DATA = /*DATA*/null;
+  const audio = new Audio();
+  let current = null;
+  function stop() {
+    audio.pause();
+    if (current) { current.el.classList.remove('playing'); current.btn.textContent = '▶'; current.bar.style.width = '0'; }
+    current = null;
+  }
+  audio.addEventListener('timeupdate', () => {
+    if (current && audio.duration) current.bar.style.width = (audio.currentTime / audio.duration * 100) + '%';
+  });
+  audio.addEventListener('ended', stop);
+
+  const root = document.getElementById('groups');
+  DATA.forEach(group => {
+    const h = document.createElement('h2');
+    h.textContent = group.title;
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    group.items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'item';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'play';
+      btn.textContent = '▶';
+      btn.setAttribute('aria-label', 'Ouvir ' + item.written);
+      const w = document.createElement('div');
+      w.className = 'written';
+      w.textContent = item.written;
+      const s = document.createElement('div');
+      s.className = 'spoken';
+      s.append('diz: ');
+      const b = document.createElement('b');
+      b.textContent = item.spoken;
+      s.append(b);
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      el.append(btn, w, s, bar);
+      btn.addEventListener('click', () => {
+        const same = current && current.el === el;
+        stop();
+        if (same) return;
+        current = { el, btn, bar };
+        el.classList.add('playing');
+        btn.textContent = '■';
+        audio.src = item.src;
+        audio.play().catch(stop);
+      });
+      grid.appendChild(el);
+    });
+    root.append(h, grid);
+  });
+</script>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Translating a book in the background, with the screen off. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Lets the voice screen ask Android, in its own dialog, to stop pausing the reading to save battery. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <application
+        android:name=".EbookReaderApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.EbookReader">
+
+        <activity
+            android:name=".ui.LibraryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.EbookReader">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.VoiceSettingsActivity"
+            android:theme="@style/Theme.EbookReader" />
+
+        <activity
+            android:name=".ui.ReaderActivity"
+            android:theme="@style/Theme.EbookReader" />
+
+        <activity
+            android:name=".ui.AboutActivity"
+            android:theme="@style/Theme.EbookReader" />
+
+        <activity
+            android:name=".ui.PrivacyActivity"
+            android:theme="@style/Theme.EbookReader" />
+
+        <activity
+            android:name=".ui.ManualActivity"
+            android:theme="@style/Theme.EbookReader" />
+
+        <service
+            android:name=".service.PlaybackService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
+
+        <service
+            android:name=".translate.TranslationService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+    </application>
+
+</manifest>

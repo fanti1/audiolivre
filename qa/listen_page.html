@@ -1,0 +1,325 @@
+<title>Existe voz melhor que o Faber?</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg: #f7f3ec;
+    --surface: #fffdf9;
+    --ink: #241e16;
+    --muted: #6e6558;
+    --line: #e4dac8;
+    --amber: #a9701a;
+    --amber-dim: #f0e2c6;
+    --good: #3d7458;
+    --bad: #a34434;
+    --shadow: 0 1px 2px rgba(60, 46, 25, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15120e;
+      --surface: #1e1a15;
+      --ink: #f1eade;
+      --muted: #9c9081;
+      --line: #322b22;
+      --amber: #e5a741;
+      --amber-dim: #3a2f1c;
+      --good: #74b391;
+      --bad: #e08a78;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15120e;
+    --surface: #1e1a15;
+    --ink: #f1eade;
+    --muted: #9c9081;
+    --line: #322b22;
+    --amber: #e5a741;
+    --amber-dim: #3a2f1c;
+    --good: #74b391;
+    --bad: #e08a78;
+    --shadow: none;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Literata, Georgia, serif;
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 42rem; margin: 0 auto; padding-inline: 20px; padding-block: 3rem 5rem; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--amber); margin: 0 0 1rem;
+  }
+  h1 { font-size: clamp(2rem, 7vw, 2.9rem); line-height: 1.1; font-weight: 700; margin: 0 0 1.1rem; text-wrap: balance; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin: 0 0 .3rem; text-wrap: balance; }
+  .lead { font-size: 1.1rem; color: var(--muted); margin: 0 0 2rem; }
+  p { margin: 0 0 1rem; }
+
+  .verdict {
+    border-left: 3px solid var(--amber);
+    background: var(--surface);
+    padding: 1.15rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    box-shadow: var(--shadow);
+    margin-bottom: 3.5rem;
+  }
+  .verdict p:last-child { margin-bottom: 0; }
+  .verdict strong { color: var(--amber); }
+
+  .group { margin-bottom: 3rem; }
+  .group-note {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .78rem; color: var(--muted); margin: 0 0 1.1rem;
+  }
+
+  .tracks { display: flex; flex-direction: column; gap: .55rem; }
+  .track {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .9rem;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: .8rem .95rem;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .track.playing { border-color: var(--amber); }
+  .track .progress {
+    position: absolute; left: 0; bottom: 0; height: 2px; width: 0;
+    background: var(--amber); transition: width .1s linear;
+  }
+  .play {
+    width: 44px; height: 44px; flex: none;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    cursor: pointer;
+    display: grid; place-items: center;
+    font-size: .95rem;
+    transition: background .15s, border-color .15s;
+  }
+  .play:hover { border-color: var(--amber); }
+  .track.playing .play { background: var(--amber); border-color: var(--amber); color: var(--surface); }
+  .play:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .body { min-width: 0; }
+  .name { font-weight: 600; font-size: 1rem; }
+  .what { color: var(--muted); font-size: .86rem; line-height: 1.45; }
+
+  .scale { margin-top: .5rem; display: flex; align-items: center; gap: .6rem; }
+  .bar {
+    flex: 1; height: 7px; border-radius: 4px; background: var(--amber-dim);
+    position: relative; overflow: hidden; min-width: 60px;
+  }
+  .bar i { position: absolute; inset: 0 auto 0 0; background: var(--amber); border-radius: 4px; }
+  .bar.human i { background: var(--good); }
+  .num {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .8rem; font-variant-numeric: tabular-nums; color: var(--muted); flex: none;
+  }
+
+  /* Reliability: one pip per sentence, filled when the voice garbled it. */
+  .rel { display: flex; flex-direction: column; gap: 1.1rem; margin-top: 1.4rem; }
+  .rel-row { display: grid; grid-template-columns: 1fr auto; gap: .35rem .9rem; align-items: baseline; }
+  .rel-name { font-weight: 600; }
+  .rel-score { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .pips { grid-column: 1 / -1; display: flex; gap: 3px; flex-wrap: wrap; }
+  .pip { width: 13px; height: 13px; border-radius: 3px; background: var(--amber-dim); }
+  .pip.broken { background: var(--bad); }
+
+  .choices { display: flex; flex-direction: column; gap: .8rem; margin-top: 1.2rem; }
+  .choice {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 1rem 1.1rem; box-shadow: var(--shadow);
+  }
+  .choice h3 { margin: 0 0 .35rem; font-size: 1.02rem; font-weight: 600; }
+  .choice p { margin: 0; color: var(--muted); font-size: .92rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--amber); display: block; margin-bottom: .3rem;
+  }
+
+  .passage {
+    font-size: .92rem; color: var(--muted); border-top: 1px solid var(--line);
+    padding-top: 1.2rem; margin-top: 3.5rem;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Audiolivre · medido em 20 de setembro</p>
+  <h1>Existe voz melhor que o Faber?</h1>
+  <p class="lead">Procurei o estado da arte em português do Brasil, rodei tudo na sua RTX 4070 e medi. Ouça e julgue: é o mesmo trecho em todas as faixas.</p>
+
+  <div class="verdict">
+    <p><strong>Existe, sim — e ela é quase humana.</strong> O Chatterbox marcou 3,87 de naturalidade nas frases do livro; um locutor humano de verdade marca 3,89. O Faber fica em 3,59.</p>
+    <p><strong>Mas ela não cabe no celular.</strong> O Chatterbox precisa da sua 4070 e, mesmo nela, leva quase o tempo real para gerar. No S23 seria dezenas de vezes mais lento que ouvir. E ele ainda erra mais: quebrou 2 ou 3 frases em 24, contra 1 do Faber.</p>
+    <p>Ou seja: no celular, em tempo real, <strong>o Faber continua sendo o teto</strong>. A voz quase humana só existe se o livro for gerado antes, no PC.</p>
+  </div>
+
+  <div id="groups"></div>
+
+  <section class="group">
+    <h2>Confiabilidade em 24 frases do livro</h2>
+    <p class="group-note">cada quadrado é uma frase · vermelho = a voz trocou, engoliu ou repetiu palavras</p>
+    <div class="rel" id="rel"></div>
+  </section>
+
+  <section class="group">
+    <h2>O que dá para fazer</h2>
+    <div class="choices">
+      <div class="choice">
+        <span class="tag">Caminho A · tudo no celular</span>
+        <h3>Ficar no Faber e atacar a prosódia</h3>
+        <p>O único erro real do Faber nas 24 frases foi nome estrangeiro: "Des Grieux" saiu como "diz Grioux". O resto do que soa artificial é ritmo, não timbre — pausas por tipo de bloco, ênfase, títulos anunciados. É a Fase 18 do plano, roda offline, não gasta bateria e mantém a leitura instantânea.</p>
+      </div>
+      <div class="choice">
+        <span class="tag">Caminho B · voz quase humana</span>
+        <h3>Audiolivro gerado antes, no PC</h3>
+        <p>O Chatterbox na 4070 gera perto do tempo real: um romance de 10 h ocupa a placa por uma noite. O app passaria a tocar o áudio pronto. Custa deixar de ser 100% no celular, exige clonar a voz de um locutor e precisa de uma checagem automática por Whisper para refazer as frases que saem erradas — hoje 1 em cada 10.</p>
+      </div>
+      <div class="choice">
+        <span class="tag">Descartados</span>
+        <h3>O que não serve</h3>
+        <p>O Kokoro é o único outro modelo que caberia no celular, e soa bem pior. O F5-TTS brasileiro vaza o texto do áudio de referência para dentro da narração. E os chineses de ponta não falam português: o CosyVoice 2 não tem o idioma e o IndexTTS-2 é focado em chinês e inglês.</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="passage" id="passage"></p>
+</div>
+
+<script>
+  const DATA = /*DATA*/null;
+  // Naturalness is reported on UTMOS's 1-5 scale, but everything real sits between a flat robot and a human
+  // narrator; the bars are drawn across that window so the differences are visible.
+  const LOW = 2.0, HIGH = 4.0;
+
+  const groups = document.getElementById('groups');
+  DATA.tracks.forEach(g => {
+    const sec = document.createElement('section');
+    sec.className = 'group';
+    const h = document.createElement('h2');
+    h.textContent = g.title;
+    const note = document.createElement('p');
+    note.className = 'group-note';
+    note.textContent = g.note;
+    const list = document.createElement('div');
+    list.className = 'tracks';
+    g.rows.forEach(r => list.appendChild(track(r)));
+    sec.append(h, note, list);
+    groups.appendChild(sec);
+  });
+
+  function track(r) {
+    const el = document.createElement('article');
+    el.className = 'track';
+    const btn = document.createElement('button');
+    btn.className = 'play';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Ouvir ' + r.name);
+    btn.textContent = '▶';
+    const body = document.createElement('div');
+    body.className = 'body';
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = r.name;
+    const what = document.createElement('div');
+    what.className = 'what';
+    what.textContent = r.what;
+    body.append(name, what);
+    if (r.utmos != null) {
+      const scale = document.createElement('div');
+      scale.className = 'scale';
+      const bar = document.createElement('div');
+      bar.className = 'bar' + (r.human ? ' human' : '');
+      const fill = document.createElement('i');
+      const pct = Math.max(0, Math.min(1, (r.utmos - LOW) / (HIGH - LOW))) * 100;
+      fill.style.width = pct.toFixed(1) + '%';
+      bar.appendChild(fill);
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = r.utmos.toFixed(2).replace('.', ',') + ' naturalidade';
+      scale.append(bar, num);
+      body.appendChild(scale);
+    }
+    const progress = document.createElement('div');
+    progress.className = 'progress';
+    el.append(btn, body, progress);
+
+    btn.addEventListener('click', () => play(el, btn, progress, r.src));
+    return el;
+  }
+
+  let current = null;
+  const audio = new Audio();
+  function stop() {
+    audio.pause();
+    if (current) {
+      current.el.classList.remove('playing');
+      current.btn.textContent = '▶';
+      current.progress.style.width = '0';
+    }
+    current = null;
+  }
+  function play(el, btn, progress, src) {
+    const same = current && current.el === el;
+    stop();
+    if (same) return;
+    current = { el, btn, progress };
+    el.classList.add('playing');
+    btn.textContent = '■';
+    audio.src = src;
+    audio.play().catch(() => stop());
+  }
+  audio.addEventListener('timeupdate', () => {
+    if (current && audio.duration) current.progress.style.width = (audio.currentTime / audio.duration * 100) + '%';
+  });
+  audio.addEventListener('ended', stop);
+
+  const rel = document.getElementById('rel');
+  const LABELS = {
+    'piper-faber': 'Faber — a voz do app',
+    'piper-dii': 'Dii — a feminina do app',
+    'f5-human-female': 'F5 com narradora humana',
+    'f5-human-male': 'F5 com narrador humano',
+    'cb-short-male': 'Chatterbox — voz masculina',
+    'cb-short-female': 'Chatterbox — voz feminina',
+  };
+  const ORDER = ['piper-faber', 'cb-short-male', 'cb-short-female', 'piper-dii', 'f5-human-female', 'f5-human-male'];
+  DATA.book.slice().sort((a, b) => ORDER.indexOf(a.voice) - ORDER.indexOf(b.voice)).forEach(b => {
+    const row = document.createElement('div');
+    row.className = 'rel-row';
+    const name = document.createElement('div');
+    name.className = 'rel-name';
+    name.textContent = LABELS[b.voice] || b.voice;
+    const score = document.createElement('div');
+    score.className = 'rel-score';
+    score.textContent = b.broken + ' de ' + b.sentences + ' erradas';
+    const pips = document.createElement('div');
+    pips.className = 'pips';
+    const bad = new Set(b.broken_idx);
+    for (let i = 0; i < b.sentences; i++) {
+      const p = document.createElement('span');
+      p.className = 'pip' + (bad.has(i) ? ' broken' : '');
+      p.title = 'frase ' + (i + 1);
+      pips.appendChild(p);
+    }
+    row.append(name, score, pips);
+    rel.appendChild(row);
+  });
+
+  document.getElementById('passage').textContent = '“' + DATA.passage + '”';
+</script>

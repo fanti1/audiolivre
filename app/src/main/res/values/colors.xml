@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="night_background">#121110</color>
+    <!-- Behind the app while it starts: paper in light mode, night in dark mode (values-night). -->
+    <color name="window_background">#FBF8F2</color>
+    <color name="amber">#F0B45A</color>
+</resources>

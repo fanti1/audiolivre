@@ -1,0 +1,313 @@
+<title>Revisão das onomatopeias</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --surface: #fffcf7;
+    --ink: #231c17;
+    --muted: #6d6259;
+    --line: #e2d7c8;
+    --accent: #8e2a22;
+    --accent-dim: #f1dcd6;
+    --good: #2f6b4b;
+    --good-dim: #dcebe1;
+    --bad: #a33a2c;
+    --bad-dim: #f5dcd6;
+    --shadow: 0 1px 2px rgba(50, 30, 20, .07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141110; --surface: #1d1917; --ink: #f0e8e0; --muted: #a09387; --line: #342c27;
+      --accent: #e0735f; --accent-dim: #3b221d; --good: #7cc39c; --good-dim: #1d3328;
+      --bad: #ee8a78; --bad-dim: #3d211c; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141110; --surface: #1d1917; --ink: #f0e8e0; --muted: #a09387; --line: #342c27;
+    --accent: #e0735f; --accent-dim: #3b221d; --good: #7cc39c; --good-dim: #1d3328;
+    --bad: #ee8a78; --bad-dim: #3d211c; --shadow: none;
+  }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Literata, Georgia, serif; font-size: 17px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 40rem; margin: 0 auto; padding-inline: 16px; padding-block: 2.4rem 6rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .72rem;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 .8rem;
+  }
+  h1 { font-size: clamp(1.8rem, 7vw, 2.5rem); line-height: 1.1; margin: 0 0 .8rem; text-wrap: balance; }
+  .lead { color: var(--muted); margin: 0 0 1.2rem; }
+
+  .status {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    padding: .7rem 0; margin-bottom: 1rem;
+    display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between;
+  }
+  .count { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .82rem; font-variant-numeric: tabular-nums; }
+  .count b.g { color: var(--good); } .count b.r { color: var(--bad); }
+  .toggle { display: flex; gap: .45rem; align-items: center; font-size: .9rem; color: var(--muted); cursor: pointer; }
+  .toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .banner {
+    display: none; background: var(--bad-dim); color: var(--ink); border: 1px solid var(--bad);
+    border-radius: 10px; padding: .75rem .9rem; margin-bottom: 1rem; font-size: .92rem;
+  }
+  .banner.show { display: block; }
+
+  h2 { font-size: 1.1rem; margin: 1.8rem 0 .7rem; text-wrap: balance; }
+  .sound {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: .85rem .9rem; margin-bottom: .6rem; box-shadow: var(--shadow);
+  }
+  .sound.good { border-color: var(--good); }
+  .sound.bad { border-color: var(--bad); }
+  .head { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; }
+  .written { font-weight: 700; font-size: 1.2rem; }
+  .chip {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .7rem; letter-spacing: .08em;
+    text-transform: uppercase; padding: .15rem .5rem; border-radius: 999px; white-space: nowrap;
+  }
+  .chip.good { background: var(--good-dim); color: var(--good); }
+  .chip.bad { background: var(--bad-dim); color: var(--bad); }
+
+  .opt { display: flex; align-items: center; gap: .7rem; padding: .35rem 0; }
+  .play {
+    width: 44px; height: 44px; flex: none; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); cursor: pointer; font-size: .9rem;
+    display: grid; place-items: center;
+  }
+  .play.on { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .play:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .said { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .86rem; }
+  .said small { display: block; color: var(--muted); font-size: .72rem; }
+
+  .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .6rem; }
+  .btn {
+    min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg);
+    color: var(--ink); font: inherit; font-weight: 600; cursor: pointer;
+  }
+  .btn.good.on { background: var(--good); border-color: var(--good); color: var(--surface); }
+  .btn.bad.on { background: var(--bad); border-color: var(--bad); color: var(--surface); }
+
+  .alts { display: none; margin-top: .8rem; border-top: 1px dashed var(--line); padding-top: .6rem; }
+  .sound.bad .alts, .pickmode .alts { display: block; }
+  .pickmode .alts { border-top: none; margin-top: .4rem; padding-top: 0; }
+  .tag { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .7rem; color: var(--accent); margin-left: .4rem; }
+  .chip.picked { background: var(--accent-dim); color: var(--accent); }
+  .alts p { margin: 0 0 .3rem; font-size: .9rem; color: var(--muted); }
+  .pick {
+    display: flex; align-items: center; gap: .7rem; padding: .3rem .4rem; border-radius: 10px;
+    border: 1px solid transparent;
+  }
+  .pick.on { border-color: var(--accent); background: var(--accent-dim); }
+  .pick label { flex: 1; display: flex; align-items: center; gap: .6rem; cursor: pointer; min-height: 44px; }
+  .pick input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+  .pick .none { width: 44px; flex: none; }
+  .note {
+    width: 100%; box-sizing: border-box; margin-top: .5rem; min-height: 44px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit;
+    font-size: .92rem; padding: .55rem .7rem;
+  }
+  .hide { display: none; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Audiolivre · onomatopeias</p>
+  <h1>Revisão das onomatopeias</h1>
+  <p class="lead" id="lead">Ouça cada som e marque <b>Boa</b> ou <b>Ruim</b>. Se marcar Ruim, ouça as alternativas e escolha a que fica melhor, ou diga que nenhuma presta. Tudo é salvo na hora.</p>
+  <div class="banner" id="banner">As marcações <b>não estão sendo salvas</b> nesta tela. Abra esta página pelo link em claude.ai, entrando com a sua conta.</div>
+  <div class="status">
+    <span class="count" id="count">0 de 0 marcadas</span>
+    <label class="toggle"><input type="checkbox" id="onlyTodo"> Mostrar só as que faltam</label>
+  </div>
+  <div id="groups"></div>
+</div>
+
+<script>
+  const DATA = /*DATA*/null;
+  const PICK = DATA.mode === 'pick';
+  const COLLECTION = DATA.collection;
+  if (PICK) {
+    document.getElementById('lead').textContent = 'Segunda rodada: só os sons que ainda não prestaram, cada um com opções novas feitas a partir das suas anotações. Toque ▶ para ouvir e escolha a melhor, ou marque que nenhuma presta. Tudo é salvo na hora.';
+  }
+  const marks = {};            // sound id -> {verdict, pick, note}
+  let db = null;
+  const writing = {};          // sound id -> promise chain, so one doc gets one write at a time
+
+  const audio = new Audio();
+  let playing = null;
+  function stopAudio() {
+    audio.pause();
+    if (playing) { playing.classList.remove('on'); playing.textContent = '▶'; }
+    playing = null;
+  }
+  audio.addEventListener('ended', stopAudio);
+  function playBtn(src, label) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'play'; b.textContent = '▶';
+    b.setAttribute('aria-label', 'Ouvir ' + label);
+    b.addEventListener('click', () => {
+      const same = playing === b;
+      stopAudio();
+      if (same) return;
+      playing = b; b.classList.add('on'); b.textContent = '■';
+      audio.src = src; audio.play().catch(stopAudio);
+    });
+    return b;
+  }
+
+  const all = DATA.groups.flatMap(g => g.sounds);
+  const cards = {};
+
+  function save(sound) {
+    const m = marks[sound.id];
+    if (!db || !m) return;
+    const body = {
+      written: sound.written,
+      current: PICK ? null : sound.options[0].text,
+      verdict: m.verdict || null,
+      pick: m.pick || null,
+      pickText: pickText(sound, m.pick),
+      note: m.note || '',
+    };
+    const prev = writing[sound.id] || Promise.resolve();
+    writing[sound.id] = prev.then(() => db.doc(COLLECTION + '/' + sound.id).set(body)).catch(err => {
+      if (err && (err.code === 'invalid_argument' || err.code === 'not_granted' || err.code === 'revoked')) {
+        document.getElementById('banner').classList.add('show');
+      }
+    });
+  }
+  function pickText(sound, pick) {
+    if (pick === 'silencio') return '(não ler)';
+    if (pick === 'nenhuma') return '(nenhuma presta)';
+    const o = sound.options.find(x => x.id === pick);
+    return o ? o.text : null;
+  }
+
+  function render(sound) {
+    const c = cards[sound.id];
+    const m = marks[sound.id] || {};
+    c.el.classList.toggle('good', m.verdict === 'boa');
+    c.el.classList.toggle('bad', m.verdict === 'ruim');
+    c.good.classList.toggle('on', m.verdict === 'boa');
+    c.bad.classList.toggle('on', m.verdict === 'ruim');
+    if (PICK) {
+      c.chip.className = 'chip' + (m.pick === 'nenhuma' ? ' bad' : m.pick ? ' picked' : '');
+      c.chip.textContent = m.pick === 'nenhuma' ? 'nenhuma' : m.pick === 'silencio' ? 'não ler' : m.pick ? 'escolhida' : '';
+    } else {
+      c.chip.className = 'chip' + (m.verdict === 'boa' ? ' good' : m.verdict === 'ruim' ? ' bad' : '');
+      c.chip.textContent = m.verdict === 'boa' ? 'boa' : m.verdict === 'ruim' ? 'ruim' : '';
+    }
+    c.picks.forEach(p => {
+      const on = m.pick === p.value;
+      p.input.checked = on;
+      p.row.classList.toggle('on', on);
+    });
+    if (document.activeElement !== c.note) c.note.value = m.note || '';
+    c.el.classList.toggle('hide', onlyTodo.checked && !!(PICK ? m.pick : m.verdict));
+  }
+
+  function renderCount() {
+    const el = document.getElementById('count');
+    el.innerHTML = '';
+    if (PICK) {
+      const done = all.filter(s => marks[s.id] && marks[s.id].pick);
+      const none = done.filter(s => marks[s.id].pick === 'nenhuma').length;
+      el.append(done.length + ' de ' + all.length + ' decididos · ');
+      const r = document.createElement('b'); r.className = 'r'; r.textContent = none + ' sem opção boa';
+      el.append(r);
+      return;
+    }
+    const vals = all.map(s => marks[s.id] && marks[s.id].verdict).filter(Boolean);
+    const good = vals.filter(v => v === 'boa').length, bad = vals.filter(v => v === 'ruim').length;
+    el.append(vals.length + ' de ' + all.length + ' marcadas · ');
+    const g = document.createElement('b'); g.className = 'g'; g.textContent = good + ' boas';
+    const r = document.createElement('b'); r.className = 'r'; r.textContent = bad + ' ruins';
+    el.append(g, ' · ', r);
+  }
+
+  function setMark(sound, patch) {
+    marks[sound.id] = Object.assign({}, marks[sound.id] || {}, patch);
+    render(sound); renderCount(); save(sound);
+  }
+
+  const onlyTodo = document.getElementById('onlyTodo');
+  onlyTodo.addEventListener('change', () => all.forEach(render));
+
+  const root = document.getElementById('groups');
+  DATA.groups.forEach(group => {
+    const h = document.createElement('h2'); h.textContent = group.title; root.appendChild(h);
+    group.sounds.forEach(sound => {
+      const el = document.createElement('article'); el.className = 'sound' + (PICK ? ' pickmode' : '');
+      const head = document.createElement('div'); head.className = 'head';
+      const w = document.createElement('div'); w.className = 'written'; w.textContent = sound.written;
+      const chip = document.createElement('span'); chip.className = 'chip';
+      head.append(w, chip);
+
+      const cur = sound.options[0];
+      const opt = document.createElement('div'); opt.className = 'opt';
+      const said = document.createElement('div'); said.className = 'said';
+      const small = document.createElement('small'); small.textContent = 'o app diz hoje';
+      said.append(small, cur.text);
+      opt.append(playBtn(cur.src, sound.written), said);
+
+      const verdict = document.createElement('div'); verdict.className = 'verdict';
+      const good = document.createElement('button'); good.type = 'button'; good.className = 'btn good'; good.textContent = 'Boa';
+      const bad = document.createElement('button'); bad.type = 'button'; bad.className = 'btn bad'; bad.textContent = 'Ruim';
+      good.addEventListener('click', () => setMark(sound, { verdict: 'boa', pick: null }));
+      bad.addEventListener('click', () => setMark(sound, { verdict: 'ruim' }));
+      verdict.append(good, bad);
+
+      const alts = document.createElement('div'); alts.className = 'alts';
+      const p = document.createElement('p'); p.textContent = PICK ? 'Escolha a melhor:' : 'Qual fica melhor?';
+      alts.appendChild(p);
+      const picks = [];
+      const choices = (PICK ? sound.options : sound.options.slice(1)).map(o => ({ value: o.id, text: o.text, tag: o.tag, src: o.src }))
+        .concat([{ value: 'silencio', text: 'Não ler este som (silêncio)' }, { value: 'nenhuma', text: 'Nenhuma presta' }]);
+      choices.forEach(ch => {
+        const row = document.createElement('div'); row.className = 'pick';
+        const lab = document.createElement('label');
+        const input = document.createElement('input'); input.type = 'radio'; input.name = 'pick-' + sound.id; input.value = ch.value;
+        input.id = 'pick-' + sound.id + '-' + ch.value;
+        const t = document.createElement('span'); t.className = 'said'; t.textContent = ch.text;
+        if (ch.tag) { const g = document.createElement('span'); g.className = 'tag'; g.textContent = ch.tag; t.appendChild(g); }
+        lab.htmlFor = input.id;
+        lab.append(input, t);
+        if (ch.src) row.append(playBtn(ch.src, ch.text)); else { const s = document.createElement('span'); s.className = 'none'; row.append(s); }
+        row.append(lab);
+        input.addEventListener('change', () => setMark(sound, { verdict: PICK ? 'escolha' : 'ruim', pick: ch.value }));
+        alts.appendChild(row);
+        picks.push({ value: ch.value, input, row });
+      });
+      const note = document.createElement('input');
+      note.className = 'note'; note.type = 'text'; note.id = 'note-' + sound.id;
+      note.placeholder = 'Como deveria soar? (opcional)';
+      note.addEventListener('change', () => setMark(sound, { note: note.value.trim() }));
+      alts.appendChild(note);
+
+      if (PICK) el.append(head, alts); else el.append(head, opt, verdict, alts);
+      root.appendChild(el);
+      cards[sound.id] = { el, good, bad, chip, picks, note };
+      render(sound);
+    });
+  });
+  renderCount();
+
+  (async () => {
+    // Outside the claude.ai viewer there is no window.claude at all; the page still plays, it just can't save.
+    db = window.claude && window.claude.use ? await window.claude.use('db') : null;
+    if (!db) { document.getElementById('banner').classList.add('show'); return; }
+    db.collection(COLLECTION).onSnapshot(snap => {
+      snap.docs.forEach(d => {
+        const v = d.data();
+        if (!v) return;
+        marks[d.id] = { verdict: v.verdict || null, pick: v.pick || null, note: v.note || '' };
+      });
+      all.forEach(render); renderCount();
+    }, () => document.getElementById('banner').classList.add('show'));
+  })();
+</script>
