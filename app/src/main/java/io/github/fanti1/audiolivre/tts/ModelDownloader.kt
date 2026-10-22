@@ -21,8 +21,8 @@ class ModelDownloader(private val context: Context) {
     fun voiceDir(voice: VoiceModel): File =
         File(context.filesDir, "tts/${voice.id}")
 
-    // The espeak-ng pronunciation data ships inside every voice archive and is identical, so the first voice
-    // installed keeps it for all of them: 18 MB once instead of 18 MB per voice.
+    // The espeak-ng pronunciation data is the same for every voice, so one copy serves all of them. It comes with
+    // the app (18 MB); the copy inside each downloaded archive is thrown away.
     fun sharedDataDir(): File = File(context.filesDir, "tts/${VoiceModels.SHARED_DATA_DIR}")
 
     val voicesDir: File get() = File(context.filesDir, "tts")
@@ -31,7 +31,35 @@ class ModelDownloader(private val context: Context) {
 
     // A model split across several files is only usable once every file is extracted, so a marker
     // written last (not the presence of any one file) decides whether the download finished.
-    fun isDownloaded(voice: VoiceModel): Boolean = File(voiceDir(voice), COMPLETE_MARKER).exists()
+    fun isDownloaded(voice: VoiceModel): Boolean = voice.bundled || File(voiceDir(voice), COMPLETE_MARKER).exists()
+
+    // espeak-ng only reads its data from a real folder, so the APK's copy is unpacked once before the first voice
+    // loads. All of it: the Portuguese dictionary hands words to the English, French and Italian ones, and
+    // espeak-ng crashes on Android when one of those is missing. Data an earlier version kept from a downloaded
+    // voice is the same and stays. Those versions also downloaded the voices that now ship in the APK, which only
+    // take space now.
+    fun ensureSharedData() = synchronized(sharedDataLock) {
+        val shared = sharedDataDir()
+        val assetDir = "${VoiceModels.ASSETS_DIR}/${VoiceModels.SHARED_DATA_DIR}"
+        if (context.assets.list(assetDir).orEmpty().any { !File(shared, it).exists() }) {
+            val partial = File(voicesDir, "${VoiceModels.SHARED_DATA_DIR}.part")
+            partial.deleteRecursively()
+            copyAssets(assetDir, partial)
+            shared.deleteRecursively()
+            if (!partial.renameTo(shared)) throw IOException("Não foi possível instalar os dados de pronúncia")
+        }
+        VoiceModels.ALL.filter { it.bundled }.forEach { voiceDir(it).deleteRecursively() }
+    }
+
+    private fun copyAssets(path: String, destination: File) {
+        val children = context.assets.list(path).orEmpty()
+        if (children.isEmpty()) {
+            destination.parentFile?.mkdirs()
+            context.assets.open(path).use { input -> destination.outputStream().use { input.copyTo(it) } }
+        } else {
+            children.forEach { copyAssets("$path/$it", File(destination, it)) }
+        }
+    }
 
     fun sizeOnDiskMb(voice: VoiceModel): Int =
         (voiceDir(voice).walkTopDown().filter { it.isFile }.sumOf { it.length() } / 1_000_000).toInt()
@@ -46,6 +74,7 @@ class ModelDownloader(private val context: Context) {
         onProgress: (InstallProgress) -> Unit = {},
     ): File = runInterruptible(Dispatchers.IO) {
         val dir = voiceDir(voice)
+        ensureSharedData()
         if (isDownloaded(voice)) return@runInterruptible dir
 
         var last: InstallProgress? = null
@@ -66,7 +95,7 @@ class ModelDownloader(private val context: Context) {
             extractTarBz2(tempArchive, dir, stripRootDir = voice.archiveRootDirName) { done, total ->
                 report(InstallStage.INSTALLING, done, total)
             }
-            shareEspeakData(dir)
+            File(dir, VoiceModels.SHARED_DATA_DIR).deleteRecursively()
             File(dir, COMPLETE_MARKER).createNewFile()
             EventLog.record("voz ${voice.id} baixada")
         } catch (e: Exception) {
@@ -79,21 +108,8 @@ class ModelDownloader(private val context: Context) {
         dir
     }
 
-    private fun shareEspeakData(voiceDir: File) {
-        val bundled = File(voiceDir, VoiceModels.SHARED_DATA_DIR)
-        if (!bundled.isDirectory) return
-        val shared = sharedDataDir()
-        if (shared.isDirectory && (shared.listFiles()?.isNotEmpty() == true)) {
-            bundled.deleteRecursively()
-        } else {
-            shared.parentFile?.mkdirs()
-            shared.deleteRecursively()
-            if (!bundled.renameTo(shared)) bundled.copyRecursively(shared, overwrite = true).also { bundled.deleteRecursively() }
-        }
-    }
-
     fun deleteVoice(voice: VoiceModel) {
-        voiceDir(voice).deleteRecursively()
+        if (!voice.bundled) voiceDir(voice).deleteRecursively()
     }
 
     private fun downloadWithProgress(
@@ -180,6 +196,9 @@ class ModelDownloader(private val context: Context) {
         const val COMPLETE_MARKER = ".complete"
     }
 }
+
+// One app-wide lock: the reader and the voice screen each have their own ModelDownloader.
+private val sharedDataLock = Any()
 
 enum class InstallStage { DOWNLOADING, INSTALLING }
 

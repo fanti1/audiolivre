@@ -1,5 +1,6 @@
 package io.github.fanti1.audiolivre.tts
 
+import android.content.res.AssetManager
 import android.util.Log
 import io.github.fanti1.audiolivre.data.EventLog
 import com.k2fsa.sherpa.onnx.GenerationConfig
@@ -22,6 +23,8 @@ private const val MAX_LOADED_VOICES = 3
 class PiperEngine(
     private val voicesDir: File,
     private val sharedDataDir: File,
+    // Where the bundled voices are read from, straight out of the APK.
+    private val assets: AssetManager,
     private val numThreads: Int = 4,
     // ONNX Runtime session settings, as sherpa-onnx reads them from a "cpu:<file>" provider (see VoiceMemoryMode).
     private val sessionConfig: File? = null,
@@ -34,7 +37,8 @@ class PiperEngine(
 
     fun sampleRate(): Int = VoiceModels.PLAYBACK_SAMPLE_RATE
 
-    fun isReady(voiceId: String): Boolean = File(File(voicesDir, voiceId), COMPLETE_MARKER).isFile
+    fun isReady(voiceId: String): Boolean =
+        VoiceModels.byId(voiceId)?.bundled == true || File(File(voicesDir, voiceId), COMPLETE_MARKER).isFile
 
     // One synthesis at a time: a cancelled playback's last sentence may still be running natively when the next
     // playback starts, and two of them must not share a model.
@@ -71,14 +75,22 @@ class PiperEngine(
 
     private fun engineFor(voice: VoiceModel): OfflineTts {
         loaded[voice.id]?.let { return it }
-        val dir = File(voicesDir, voice.id)
-        val model = dir.listFiles { f -> f.extension == "onnx" }?.firstOrNull()
-            ?: error("voice ${voice.id} is missing its model file")
+        // A bundled voice's paths are inside the APK; the pronunciation data and the session settings are always
+        // real files, whichever way the model is read.
+        val (model, tokens) = if (voice.bundled) {
+            val dir = "${VoiceModels.ASSETS_DIR}/${voice.id}"
+            "$dir/${VoiceModels.BUNDLED_MODEL}" to "$dir/tokens.txt"
+        } else {
+            val dir = File(voicesDir, voice.id)
+            val file = dir.listFiles { f -> f.extension == "onnx" }?.firstOrNull()
+                ?: error("voice ${voice.id} is missing its model file")
+            file.absolutePath to File(dir, "tokens.txt").absolutePath
+        }
         val config = OfflineTtsConfig(
             model = OfflineTtsModelConfig(
                 vits = OfflineTtsVitsModelConfig(
-                    model = model.absolutePath,
-                    tokens = File(dir, "tokens.txt").absolutePath,
+                    model = model,
+                    tokens = tokens,
                     dataDir = sharedDataDir.absolutePath,
                     noiseScale = voice.noiseScale,
                     noiseScaleW = voice.noiseScaleW,
@@ -91,7 +103,7 @@ class PiperEngine(
             // The pauses a listener hears all come from Prosody instead.
             silenceScale = 1f,
         )
-        val tts = OfflineTts(config = config)
+        val tts = OfflineTts(assetManager = if (voice.bundled) assets else null, config = config)
         loaded[voice.id] = tts
         EventLog.record("voz ${voice.id} carregada na memória (${loaded.size} carregadas)")
         // LinkedHashMap in access order: the first entry is the one untouched for longest.

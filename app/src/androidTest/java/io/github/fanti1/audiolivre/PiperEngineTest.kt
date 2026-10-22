@@ -12,14 +12,14 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
-// Speaks on the device with the voices that happen to be installed. Skipped when none are, so a machine without
-// downloaded voices still runs the rest of the suite.
+// Speaks on the device with the voices that are installed: the narrator's always is, since it ships in the APK.
+// The test that needs a second voice is skipped when none was downloaded.
 @RunWith(AndroidJUnit4::class)
 class PiperEngineTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val downloader = ModelDownloader(context)
-    private val engine = PiperEngine(downloader.voicesDir, downloader.sharedDataDir())
+    private val downloader = ModelDownloader(context).apply { ensureSharedData() }
+    private val engine = PiperEngine(downloader.voicesDir, downloader.sharedDataDir(), context.assets)
     private val sentence = "Naquela noite, a cidade parecia diferente."
 
     @Test

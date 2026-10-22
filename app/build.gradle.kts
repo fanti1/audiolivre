@@ -1,4 +1,7 @@
 import java.util.Properties
+import java.net.URI
+import java.security.MessageDigest
+import javax.inject.Inject
 
 plugins {
     id("com.android.application")
@@ -22,8 +25,8 @@ android {
         // 26 (Android 8.0) needed for AudioTrack MODE_STREAM float encoding used by the TTS pipeline.
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -40,7 +43,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 drops the unused parts of the libraries (pdfbox, BouncyCastle, commons-compress): a smaller APK
+            // to make room for the narrator's voice. proguard-rules.pro keeps what native code calls by name.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.findByName("release")
             // Phones are ARM64; the x86_64 libraries only serve the emulator and would double the download.
             ndk { abiFilters += "arm64-v8a" }
@@ -83,7 +90,93 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // BouncyCastle (pulled in by pdfbox for encrypted PDFs) carries 8 MB of post-quantum key tables
+            // that PDF encryption never uses.
+            excludes += "/org/bouncycastle/pqc/**/*.properties"
         }
+    }
+
+    // The bundled voice model is read straight from the APK; stored uncompressed it loads without inflating.
+    androidResources {
+        noCompress += "onnx"
+    }
+}
+
+// The narrator's voice ships inside the APK, so the first book reads without a download. The archive is the
+// same one the app downloads the other voices from (VoiceModel.downloadUrl), pinned by its hash so every build
+// bundles the same bytes. The pronunciation data goes in whole: the Portuguese dictionary hands words to other
+// languages' dictionaries, and espeak-ng crashes on Android when one of them is missing.
+val narratorArchive = "vits-piper-pt_BR-faber-medium.tar.bz2"
+val narratorArchiveSha256 = "7add3f923ad6bc25ca8a192805fd1a64d1b3893e4611c4a9719545a825039a83"
+
+androidComponents {
+    onVariants { variant ->
+        val bundle = tasks.register<BundleNarratorVoice>("bundle${variant.name.replaceFirstChar(Char::uppercase)}NarratorVoice") {
+            url.set("https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/$narratorArchive")
+            sha256.set(narratorArchiveSha256)
+            voiceId.set("faber")
+            archive.set(rootProject.layout.projectDirectory.file(".gradle/voices/$narratorArchive"))
+        }
+        variant.sources.assets?.addGeneratedSourceDirectory(bundle, BundleNarratorVoice::outputDir)
+    }
+}
+
+// Writes assets/tts/<voice>/model.onnx, assets/tts/<voice>/tokens.txt and assets/tts/espeak-ng-data/.
+abstract class BundleNarratorVoice : DefaultTask() {
+    @get:Input abstract val url: Property<String>
+    @get:Input abstract val sha256: Property<String>
+    @get:Input abstract val voiceId: Property<String>
+    // A download cache outside build/, so a clean build doesn't fetch 67 MB again.
+    @get:Internal abstract val archive: RegularFileProperty
+    @get:OutputDirectory abstract val outputDir: DirectoryProperty
+    @get:Inject abstract val archives: ArchiveOperations
+    @get:Inject abstract val fileSystem: FileSystemOperations
+
+    @TaskAction
+    fun bundle() {
+        val file = archive.get().asFile
+        if (!file.isFile || sha256Of(file) != sha256.get()) {
+            file.parentFile.mkdirs()
+            val partial = File(file.path + ".part")
+            logger.lifecycle("Downloading ${url.get()}")
+            URI(url.get()).toURL().openStream().use { input -> partial.outputStream().use { input.copyTo(it) } }
+            val actual = sha256Of(partial)
+            if (actual != sha256.get()) {
+                partial.delete()
+                throw GradleException("${file.name} has SHA-256 $actual, expected ${sha256.get()}")
+            }
+            partial.renameTo(file.also { it.delete() })
+        }
+        val voice = voiceId.get()
+        fileSystem.sync {
+            // The .tar.bz2 extension tells Gradle how to unpack it.
+            from(archives.tarTree(file))
+            into(outputDir)
+            includeEmptyDirs = false
+            eachFile {
+                val inside = relativePath.segments.drop(1)
+                val target = when {
+                    inside.firstOrNull() == "espeak-ng-data" -> listOf("tts") + inside
+                    inside.size == 1 && name.endsWith(".onnx") -> listOf("tts", voice, "model.onnx")
+                    inside.size == 1 && name == "tokens.txt" -> listOf("tts", voice, "tokens.txt")
+                    else -> null
+                }
+                if (target == null) exclude() else relativePath = RelativePath(true, *target.toTypedArray())
+            }
+        }
+    }
+
+    private fun sha256Of(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        file.inputStream().use { input ->
+            val buffer = ByteArray(1 shl 16)
+            while (true) {
+                val read = input.read(buffer)
+                if (read < 0) break
+                digest.update(buffer, 0, read)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 }
 

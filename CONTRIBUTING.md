@@ -15,7 +15,9 @@ bash app/src/main/cpp/fetch_third_party.sh   # código do motor de tradução, n
 ```
 
 - Sem o `fetch_third_party.sh`, o app compila do mesmo jeito, mas sai sem o tradutor.
-- O APK de debug inclui as bibliotecas x86_64, para rodar no emulador. O de release leva só ARM64.
+- O APK de debug inclui as bibliotecas x86_64, para rodar no emulador. O de release leva só ARM64, então não roda no emulador do PC.
+- A voz do narrador (Faber) vai dentro do APK. No primeiro build, o Gradle baixa o pacote dela da release `tts-models` do sherpa-onnx (67 MB), confere o SHA-256 e guarda em `.gradle/voices/`. Os builds seguintes usam essa cópia. Veja `BundleNarratorVoice` em `app/build.gradle.kts`.
+- O release passa pelo R8 (`isMinifyEnabled`). Classes que o código nativo chama pelo nome precisam de regra em `app/proguard-rules.pro`.
 
 ## APK de release
 

@@ -267,8 +267,8 @@ private fun VoiceScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            "Todas as vozes são brasileiras e leem no aparelho, sem internet. Cada uma ocupa cerca de 63 MB e só " +
-                "é baixada quando você escolhe.",
+            "Todas as vozes são brasileiras e leem no aparelho, sem internet. O Faber já vem com o app; as outras " +
+                "ocupam cerca de 63 MB cada e só são baixadas quando você escolhe.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp),
@@ -435,7 +435,7 @@ private fun VoiceCard(
                     }
                 }
 
-                is VoiceState.Ready -> if (!selected) {
+                is VoiceState.Ready -> if (!selected && !voice.bundled) {
                     Spacer(Modifier.height(4.dp))
                     TextButton(onClick = onDelete) { Text("Apagar do aparelho") }
                 }
@@ -499,7 +499,7 @@ private fun TranslatorCard(id: String, bytes: Long, onDelete: () -> Unit) {
 }
 
 private fun stateSuffix(state: VoiceState, voice: VoiceModel): String = when (state) {
-    is VoiceState.Ready -> " · baixada"
+    is VoiceState.Ready -> if (voice.bundled) " · vem com o app" else " · baixada"
     is VoiceState.Missing -> " · ${voice.approxSizeMb} MB para baixar"
     is VoiceState.Downloading -> " · baixando"
     is VoiceState.Failed -> " · ${state.message}"

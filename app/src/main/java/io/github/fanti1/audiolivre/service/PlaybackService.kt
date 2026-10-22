@@ -123,9 +123,11 @@ class PlaybackService : LifecycleService() {
             val mode = VoiceMemoryMode.choose(memory.totalMem, activities.isLowRamDevice, pace)
             pace.useLean(mode == VoiceMemoryMode.LEAN, VoiceMemoryMode.LEAN_SLOWDOWN)
             EventLog.record("motor de voz: $threads threads, memória ${mode.name.lowercase()} (${memory.totalMem / 1_000_000} MB de RAM)")
+            downloader.ensureSharedData()
             PiperEngine(
                 downloader.voicesDir,
                 downloader.sharedDataDir(),
+                applicationContext.assets,
                 numThreads = threads,
                 sessionConfig = mode.configFile(downloader.voicesDir),
             )

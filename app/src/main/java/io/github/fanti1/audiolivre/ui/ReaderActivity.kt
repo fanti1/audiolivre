@@ -346,7 +346,8 @@ private fun VoiceDownloadScreen(progress: InstallProgress?, onCancel: () -> Unit
             if (installing) {
                 "Descompactando o modelo no aparelho. Falta pouco."
             } else {
-                "São ${VoiceModels.DEFAULT_NARRATOR.approxSizeMb} MB, só desta vez. Depois o app lê sem internet."
+                // Only a narrator chosen in place of the bundled one ever gets here.
+                "São cerca de 63 MB, só desta vez. Depois o app lê sem internet."
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

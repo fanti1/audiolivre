@@ -59,7 +59,7 @@ object SupportReport {
             appendLine("Narrador: ${voice.narratorVoice}; personagens: ${if (voice.characterVoices) "${voice.maleCharacterVoice} e ${voice.femaleCharacterVoice}" else "desligado"}")
             appendLine("Velocidade: ${voice.speed}×")
             val voices = VoiceModels.ALL.filter { downloader.isDownloaded(it) }
-            appendLine("Vozes baixadas: ${voices.joinToString { "${it.id} (${downloader.sizeOnDiskMb(it)} MB)" }.ifEmpty { "nenhuma" }}")
+            appendLine("Vozes instaladas: ${voices.joinToString { "${it.id} (${if (it.bundled) "vem no app" else "${downloader.sizeOnDiskMb(it)} MB"})" }}")
             appendLine("Ritmo de síntese: %.2f ms de trabalho por ms de fala; %d threads".format(pace.ratio, SynthesisPace.threadsFor(cores)))
             appendLine("Áudio preparado à frente: ${pace.aheadMs / 1000} s; antes de começar: ${pace.startBufferMs / 1000} s")
             appendLine("Vezes que o áudio esvaziou: ${pace.underruns}")

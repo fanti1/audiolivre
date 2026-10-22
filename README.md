@@ -65,7 +65,7 @@ PDF, EPUB, Kindle, Word e mais. Grátis e de código aberto.
 
 | | |
 |---|---|
-| 📵 **Tudo no celular** | A voz é gerada no próprio aparelho. Depois de baixar a voz uma vez, funciona sem internet, até no modo avião. |
+| 📵 **Tudo no celular** | A voz é gerada no próprio aparelho e a do narrador já vem com o app. Funciona sem internet desde o primeiro livro, até no modo avião. |
 | 🎭 **Narração de verdade** | Pausas de narrador entre frases, parágrafos e capítulos, e vozes diferentes para personagens homens e mulheres. |
 | 🗣️ **Lê como se fala** | "R$ 1.500,00" vira "mil e quinhentos reais", "Dom Pedro II" vira "Dom Pedro segundo". Nada de voz robótica soletrando símbolos. |
 | 🌎 **Qualquer idioma vira português** | Abriu um livro em inglês, espanhol ou alemão? O app traduz para o português do Brasil, no celular. |
@@ -87,7 +87,7 @@ flowchart LR
     E --> F["🎧 A voz lê em voz alta<br/>e a página acompanha"]
 ```
 
-Você só escolhe o livro e aperta ▶️. A internet é usada uma única vez, para baixar a voz e, se o livro for de outro idioma, o tradutor.
+Você só escolhe o livro e aperta ▶️. A voz do narrador já vem com o app. A internet só é usada se você quiser outras vozes ou se o livro for de outro idioma, para baixar o tradutor.
 
 ---
 
@@ -189,18 +189,18 @@ PDFs são feitos para imprimir, não para ler em voz alta. O app arruma isso ant
 
 ## 🎤 Vozes
 
-Todas em português do Brasil. Você ouve uma amostra antes de baixar e escolhe quem narra e quem faz as vozes dos personagens.
+Todas em português do Brasil. Você ouve uma amostra de cada uma e escolhe quem narra e quem faz as vozes dos personagens.
 
 | Voz | Estilo | Tamanho |
 |---|---|---|
-| **Faber** | Masculina, clara e firme *(narrador padrão)* | ~63 MB |
+| **Faber** | Masculina, clara e firme *(narrador padrão)* | já vem com o app |
 | **Cadu** | Masculina, mais grave *(personagens masculinos)* | ~63 MB |
 | **Dii** | Feminina *(personagens femininas)* | ~64 MB |
 | **Jeff** | Masculina, jovem | ~63 MB |
 | **Miro** | Masculina, grave e pausada | ~64 MB |
 | **Edresson** | Masculina, gravação mais simples | ~63 MB |
 
-Na primeira vez que você abre um livro, o app baixa **só a voz do narrador**. As outras você baixa quando quiser, na tela **Voz**. Até lá, os personagens falam com a voz do narrador.
+O **Faber** já vem instalado, então o primeiro livro começa a tocar na hora, sem download. As outras vozes você baixa quando quiser, na tela **Voz**. Até lá, os personagens falam com a voz do narrador.
 
 ---
 
@@ -210,7 +210,7 @@ Na primeira vez que você abre um livro, o app baixa **só a voz do narrador**. 
 2. Abra o arquivo baixado. Se o Android pedir, permita **"Instalar apps desconhecidos"** para o navegador ou para o gerenciador de arquivos.
 3. Se aparecer um aviso do **Play Protect**, toque em **"Mais detalhes" → "Instalar mesmo assim"**. Isso acontece com qualquer app instalado fora da Play Store.
 4. Abra o Audiolivre, toque em **Adicionar livro** e escolha um arquivo.
-5. Espere a voz do narrador baixar (só na primeira vez) e toque em ▶️.
+5. Toque em ▶️. A voz do narrador já vem com o app, não precisa baixar nada.
 
 **Para atualizar:** baixe o APK novo e instale por cima. Seus livros, posições de leitura e vozes continuam lá.
 
@@ -222,8 +222,8 @@ Na primeira vez que você abre um livro, o app baixa **só a voz do narrador**. 
 |---|---|
 | **Android** | 8.0 (Oreo) ou mais novo |
 | **Celular** | Qualquer celular dos últimos anos (precisa de processador de 64 bits, o que quase todos têm) |
-| **Espaço** | ~53 MB do app, mais ~63 MB por voz baixada e ~18 MB de dados de pronúncia (uma vez só) |
-| **Internet** | Só para baixar as vozes e, se precisar, os tradutores. Depois, funciona 100% offline |
+| **Espaço** | ~112 MB do app, já com a voz do narrador, mais ~63 MB para cada outra voz que você baixar |
+| **Internet** | Não precisa para ler. Só para baixar outras vozes e, se precisar, os tradutores |
 
 ---
 
@@ -231,7 +231,7 @@ Na primeira vez que você abre um livro, o app baixa **só a voz do narrador**. 
 
 - **Sem conta, sem anúncios e sem coleta de dados.**
 - Seus livros não saem do celular. Tudo acontece no aparelho, inclusive a voz e a tradução, e o app fica fora do backup automático do Android.
-- A internet só é usada para baixar as vozes, que vêm do GitHub, e os tradutores, que vêm da Mozilla (a mesma do Firefox). Nenhum dado seu vai junto.
+- A internet só é usada para baixar outras vozes, que vêm do GitHub, e os tradutores, que vêm da Mozilla (a mesma do Firefox). Nenhum dado seu vai junto.
 - O app pede apenas:
   - **Internet**, para baixar as vozes e os tradutores;
   - **Notificações**, para mostrar os controles enquanto o livro toca e o andamento da tradução;
@@ -253,7 +253,7 @@ Clássicos em domínio público estão no <a href="https://www.gutenberg.org/bro
 <details>
 <summary><b>Preciso de internet para ouvir?</b></summary>
 <br />
-Só na primeira vez, para baixar a voz do narrador (cerca de 80 MB, contando os dados de pronúncia). Depois disso, o app lê sem internet, até no modo avião.
+Não. A voz do narrador já vem com o app, então ele lê sem internet desde o primeiro livro, até no modo avião. A internet só é usada se você quiser baixar outras vozes ou traduzir um livro de outro idioma.
 </details>
 
 <details>

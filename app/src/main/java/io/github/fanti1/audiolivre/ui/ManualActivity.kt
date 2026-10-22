@@ -44,7 +44,7 @@ private fun ColumnScope.ManualContent() {
     PolicySection("1. Adicionar um livro") {
         Bullet("Na Biblioteca, toque em Adicionar livro e escolha o arquivo no seu celular.")
         Bullet("Funciona com PDF, EPUB, Kindle (MOBI e AZW3), Word (DOCX), ODT, RTF, FB2, HTML, TXT e Markdown.")
-        Bullet("Na primeira vez, o app baixa a voz do narrador (cerca de 63 MB). Depois disso, lê sem internet.")
+        Bullet("A voz do narrador já vem com o app: ele lê sem internet desde o primeiro livro.")
         Bullet("O arquivo continua onde estava no seu celular. O app só guarda o texto pronto para ler.")
     }
 

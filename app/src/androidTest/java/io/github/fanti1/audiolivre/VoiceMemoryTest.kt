@@ -20,7 +20,7 @@ import java.io.File
 class VoiceMemoryTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val downloader = ModelDownloader(context)
+    private val downloader = ModelDownloader(context).apply { ensureSharedData() }
 
     private val sentences = listOf(
         "Era uma vez um livro.",
@@ -51,7 +51,7 @@ class VoiceMemoryTest {
         for ((label, config) in modes + modes) {
             repeat(2) { System.gc() }
             val baseline = rssMb()
-            val engine = PiperEngine(downloader.voicesDir, downloader.sharedDataDir(), numThreads = 4, sessionConfig = config)
+            val engine = PiperEngine(downloader.voicesDir, downloader.sharedDataDir(), context.assets, numThreads = 4, sessionConfig = config)
             engine.warmUp(voice!!.id)
             val loaded = rssMb()
             var peak = loaded

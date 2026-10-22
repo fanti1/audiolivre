@@ -20,6 +20,8 @@ data class VoiceModel(
     // out both more natural and easier to understand. See VoiceModels.NOISE_SCALE.
     val noiseScale: Float = VoiceModels.NOISE_SCALE,
     val noiseScaleW: Float = VoiceModels.NOISE_SCALE_W,
+    // Ships inside the APK (assets/tts/<id>/, see app/build.gradle.kts): never downloaded, never deleted.
+    val bundled: Boolean = false,
 ) {
     val downloadUrl: String
         get() = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/$archiveName"
@@ -36,6 +38,7 @@ object VoiceModels {
         archiveName = "vits-piper-pt_BR-faber-medium.tar.bz2", approxSizeMb = 63, sampleRate = 22050,
         gender = VoiceGender.MALE,
         pace = 1.0f,
+        bundled = true,
     )
     val CADU = VoiceModel(
         id = "cadu", displayName = "Cadu", description = "Masculina, mais grave",
@@ -85,6 +88,10 @@ object VoiceModels {
 
     // espeak-ng data ships inside every voice archive; one copy serves all of them.
     const val SHARED_DATA_DIR = "espeak-ng-data"
+
+    // Where the APK keeps the bundled voices and the espeak-ng data.
+    const val ASSETS_DIR = "tts"
+    const val BUNDLED_MODEL = "model.onnx"
 
     fun byId(id: String): VoiceModel? = ALL.firstOrNull { it.id == id }
 

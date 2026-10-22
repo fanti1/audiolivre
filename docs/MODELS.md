@@ -1,6 +1,11 @@
 # Vozes (Piper via sherpa-onnx)
 
-O Audiolivre usa vozes **Piper** (modelos VITS) em português do Brasil, executadas no celular pelo [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). Cada voz é baixada sob demanda da release `tts-models` do sherpa-onnx e guardada em `filesDir/tts/<voz>/`. Um arquivo `.complete` marca que o download terminou. Os dados de pronúncia do eSpeak NG (~18 MB), que vêm dentro de cada pacote de voz, são guardados uma vez só e compartilhados entre todas as vozes. Depois do download, o app funciona sem internet.
+O Audiolivre usa vozes **Piper** (modelos VITS) em português do Brasil, executadas no celular pelo [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx).
+
+- **Faber (narrador padrão) vem dentro do APK**, em `assets/tts/faber/`. O modelo fica sem compressão e o sherpa-onnx lê direto do APK, sem cópia no disco. O pacote é baixado no build (`BundleNarratorVoice` em `app/build.gradle.kts`) e conferido pelo SHA-256.
+- **As outras vozes** são baixadas sob demanda da release `tts-models` do sherpa-onnx e guardadas em `filesDir/tts/<voz>/`. Um arquivo `.complete` marca que o download terminou.
+- **Pronúncia (eSpeak NG):** os dados (18 MB) vão no APK e, na primeira leitura, são copiados para `filesDir/tts/espeak-ng-data/`, porque o eSpeak só lê de uma pasta de verdade. Uma cópia serve a todas as vozes, e a que vem em cada voz baixada é descartada. Quem atualiza de uma versão anterior mantém os dados que já tinha (são os mesmos) e perde só o Faber baixado, que ficou redundante.
+- **Os dados vão inteiros, sem cortar idiomas.** O dicionário português manda algumas palavras para os dicionários de inglês, francês e italiano, e o italiano manda para outros. Num teste com só o dicionário português, o eSpeak derrubou o app no Android. No PC, o mesmo corte não deu erro, então não confie só em teste no PC para isso.
 
 O catálogo fica em `tts/VoiceModel.kt`:
 
@@ -13,7 +18,7 @@ O catálogo fica em `tts/VoiceModel.kt`:
 | Miro | masculina, grave e pausada | `vits-piper-pt_BR-miro-high` | 22 050 Hz |
 | Edresson | masculina, gravação mais simples | `vits-piper-pt_BR-edresson-low` | 16 000 Hz (convertida para 22 050 Hz) |
 
-Ao abrir o primeiro livro, só a voz do narrador é baixada. As vozes dos personagens são baixadas na tela **Voz**. Até lá, os personagens falam com a voz do narrador.
+Com o Faber de narrador, nenhum livro espera download. Se outro narrador for escolhido e ainda não estiver baixado, ele é baixado ao abrir o livro. As vozes dos personagens são baixadas na tela **Voz**. Até lá, os personagens falam com a voz do narrador.
 
 ## Ajustes
 
