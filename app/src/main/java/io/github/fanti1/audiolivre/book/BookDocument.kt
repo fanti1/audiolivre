@@ -84,6 +84,17 @@ data class BookDocument(
         return low
     }
 
+    // The sentence a touch on the text means: the one under the finger, or, between two of them (the spaces
+    // around a dialogue dash, a line nothing is read from, the start of a paragraph), the one that follows.
+    // sentenceAtOffset alone answers with the sentence before, which can be the end of the previous paragraph
+    // or page, so reading started from a place the reader never picked.
+    fun sentenceForTouch(offset: Int): Int {
+        val index = sentenceAtOffset(offset)
+        val sentence = sentences.getOrNull(index) ?: return 0
+        val end = sentence.charOffset + (sentence.endInParagraph - sentence.startInParagraph)
+        return if (offset > end && index < sentences.lastIndex) index + 1 else index
+    }
+
     fun chapterOf(sentenceIndex: Int): Int = paragraphs[sentences[sentenceIndex].paragraphIndex].chapterIndex
 
     // Before the book model existed, resume positions were saved as (PDF page, index among that page's sentences).

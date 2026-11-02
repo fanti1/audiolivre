@@ -25,8 +25,8 @@ android {
         // 26 (Android 8.0) needed for AudioTrack MODE_STREAM float encoding used by the TTS pipeline.
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.1"
+        versionCode = 4
+        versionName = "1.1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

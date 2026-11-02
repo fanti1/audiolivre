@@ -207,12 +207,15 @@ class ReaderActivity : ComponentActivity() {
                         state = ReaderState.PreparingVoice
                         val service = snapshotFlow { boundService }.filterNotNull().first()
                         service.ensureEngine(narrator.id)
-                        val initialIndex = when (val saved = resumeStore.load(uriString)) {
-                            is SavedPosition.Offset -> book.sentenceAtOffset(saved.charOffset)
-                            is SavedPosition.Legacy -> book.sentenceForLegacyPosition(saved.page, saved.indexInPage)
-                            null -> 0
+                        if (!service.holdsBook(uriString, book)) {
+                            val initialIndex = when (val saved = resumeStore.load(uriString)) {
+                                is SavedPosition.Offset -> book.sentenceAtOffset(saved.charOffset)
+                                is SavedPosition.Legacy -> book.sentenceForLegacyPosition(saved.page, saved.indexInPage)
+                                null -> 0
+                            }
+                            service.loadBook(uriString, book.title, book, resumeStore, initialIndex)
                         }
-                        service.loadBook(uriString, book.title, book, resumeStore, initialIndex)
+                        val initialIndex = service.state.value.currentIndex
                         library.renameIfDifferent(uriString, book.title)
                         // Lets the shelf show how far this book got, without opening it again.
                         library.updateReadingState(

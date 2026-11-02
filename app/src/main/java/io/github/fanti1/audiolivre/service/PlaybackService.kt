@@ -138,6 +138,15 @@ class PlaybackService : LifecycleService() {
 
     private val engineLock = Mutex()
 
+    // The reader comes back to a book the service already holds whenever its screen is made again: the phone
+    // turned, the dark theme switched, Android rebuilt it in the background, the book opened again from the shelf
+    // while it was being read. Loading it anew would stop the reading and go back to the last position on disk.
+    fun holdsBook(uriString: String, book: BookDocument): Boolean {
+        val held = currentBook ?: return false
+        return controller != null && bookUri == uriString && held.sentences.size == book.sentences.size &&
+            held.paragraphStarts.last() == book.paragraphStarts.last()
+    }
+
     fun loadBook(
         uriString: String,
         title: String,
@@ -238,7 +247,8 @@ class PlaybackService : LifecycleService() {
     }
 
     private fun forgetBook() {
-        controller?.release()
+        // The library is clearing this book's position (or removing it): saving it now would undo that.
+        controller?.release(savePosition = false)
         controller = null
         bookUri = null
         abandonAudioFocus()

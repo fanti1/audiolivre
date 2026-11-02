@@ -32,8 +32,6 @@ private const val TAG = "PlaybackController"
 
 // The highlight moves sentence by sentence; checking 12 times a second is still well under a word.
 private const val FOLLOW_INTERVAL_MS = 80L
-// The reading position is written at most this often while playing, and always when playback stops.
-private const val SAVE_POSITION_EVERY_MS = 5_000L
 private const val SPEED_CHECK_EVERY = 20
 private const val AHEAD_POLL_MS = 50L
 // Running dry twice in a row is one stall; it should slow the pace estimate down once, not twice.
@@ -205,9 +203,10 @@ class PlaybackController(
         }
     }
 
-    // The highlight and the resume point follow what is audible now, not what was just queued.
+    // The highlight and the resume point follow what is audible now, not what was just queued. The position is
+    // written as each sentence starts: the phone can die (battery, Android ending the app) at any moment, and then
+    // only what is already on disk counts. One small write every few seconds costs nothing.
     private suspend fun follow(player: AudioTrackPlayer, marks: ConcurrentLinkedQueue<SentenceMark>) = coroutineScope {
-        var savedAt = 0L
         while (isActive) {
             val played = player.playedFrames()
             if (played < 0) return@coroutineScope
@@ -220,11 +219,7 @@ class PlaybackController(
             }
             if (reached >= 0) {
                 state.update { it.copy(currentIndex = reached) }
-                val now = System.currentTimeMillis()
-                if (now - savedAt >= SAVE_POSITION_EVERY_MS) {
-                    savedAt = now
-                    resumeStore.save(uriString, sentences[reached].charOffset)
-                }
+                resumeStore.saveSoon(uriString, sentences[reached].charOffset)
             }
             delay(FOLLOW_INTERVAL_MS)
         }
@@ -245,7 +240,7 @@ class PlaybackController(
 
     private fun savePosition() {
         val index = state.value.currentIndex.coerceIn(0, (sentences.size - 1).coerceAtLeast(0))
-        if (sentences.isNotEmpty()) scope.launch { resumeStore.save(uriString, sentences[index].charOffset) }
+        if (sentences.isNotEmpty()) resumeStore.saveSoon(uriString, sentences[index].charOffset)
     }
 
     fun seekTo(index: Int) {
@@ -254,13 +249,14 @@ class PlaybackController(
         if (state.value.isPlaying) {
             play(clamped)
         } else {
-            state.update { it.copy(currentIndex = clamped) }
-            scope.launch { resumeStore.save(uriString, sentences[clamped].charOffset) }
+            state.update { it.copy(currentIndex = clamped, isFinished = false) }
+            resumeStore.saveSoon(uriString, sentences[clamped].charOffset)
         }
     }
 
-    fun release() {
-        if (state.value.isPlaying) savePosition()
+    // A book removed or sent back to the start from the library must not have its old position written back.
+    fun release(savePosition: Boolean = true) {
+        if (savePosition && state.value.isPlaying) savePosition()
         stopPlayback()
     }
 

@@ -314,6 +314,8 @@ private fun PagedReader(
     var userMoved by remember { mutableStateOf(false) }
     var showToc by remember { mutableStateOf(false) }
     var longPress by remember { mutableStateOf<Pair<IntOffset, Int>?>(null) }
+    // Where the reading had stopped when the reader began leafing through the book while paused.
+    var leafOrigin by remember { mutableStateOf<Int?>(null) }
 
     fun audioPageNow(): Int {
         val index = service.state.value.currentIndex.coerceIn(0, sentences.lastIndex)
@@ -340,11 +342,13 @@ private fun PagedReader(
 
     fun skipSentence(delta: Int) {
         follow = true
+        leafOrigin = null
         service.seekTo((audioIndex + delta).coerceIn(0, sentences.lastIndex))
     }
 
     fun readFrom(sentence: Int) {
         follow = true
+        leafOrigin = null
         service.seekTo(sentence)
         if (!service.state.value.isPlaying) service.play()
     }
@@ -365,6 +369,9 @@ private fun PagedReader(
     LaunchedEffect(audioPage, follow) {
         if (follow && pagerState.currentPage != audioPage) pagerState.animateScrollToPage(audioPage)
     }
+    LaunchedEffect(playback.isPlaying) {
+        if (playback.isPlaying) leafOrigin = null
+    }
     LaunchedEffect(pagerState) {
         pagerState.interactionSource.interactions.collect { if (it is DragInteraction.Start) userMoved = true }
     }
@@ -374,10 +381,15 @@ private fun PagedReader(
             if (!userMoved) return@collect
             userMoved = false
             if (service.state.value.isPlaying) {
-                if (settled != audioPageNow()) follow = false
+                // Back on the page being read, the pages follow the voice again.
+                follow = settled == audioPageNow()
             } else {
-                // Leafing through while paused moves the resume point, like a Kindle bookmark.
-                service.seekTo(firstSentenceOnPage(book, pages[settled]))
+                // Leafing through while paused moves the resume point, like a Kindle bookmark. Coming back to the
+                // page where the reading stopped puts it back on that very sentence, not on the top of the page.
+                val origin = (leafOrigin ?: service.state.value.currentIndex).coerceIn(0, sentences.lastIndex)
+                leafOrigin = origin
+                val originPage = PageBuilder.pageForOffset(pages, sentences[origin].charOffset)
+                service.seekTo(if (settled == originPage) origin else firstSentenceOnPage(book, pages[settled]))
                 follow = true
             }
         }
@@ -414,7 +426,10 @@ private fun PagedReader(
                     measurer = measurer,
                     textColor = colors.text,
                     highlightColor = colors.highlight,
-                    highlight = audioSentence.takeIf { playback.isPlaying },
+                    // While the "Ler a partir daqui" bubble is open, the sentence it will read from is marked: a
+                    // press lands on a word, and the reading starts where that word's sentence starts, which can
+                    // be lines above it or on the page before.
+                    highlight = longPress?.let { sentences.getOrNull(it.second) } ?: audioSentence.takeIf { playback.isPlaying },
                     highlightStyle = prefs.highlightStyle,
                     focusMode = prefs.focusMode,
                     actions = PageActions(

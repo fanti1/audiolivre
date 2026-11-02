@@ -124,7 +124,7 @@ fun KindlePage(
             val start = layout.getLineStart(lines.first)
             val text = paragraph.text.substring(start, layout.getLineEnd(lines.last))
             val height = layout.getLineBottom(lines.last) - layout.getLineTop(lines.first)
-            val sentence = book.sentenceAtOffset(book.paragraphStarts[slice.paragraph] + start)
+            val sentence = book.sentenceForTouch(book.paragraphStarts[slice.paragraph] + start)
             Box(
                 modifier = Modifier
                     .offset { IntOffset(left.roundToInt(), slice.y.roundToInt()) }
@@ -197,10 +197,12 @@ private fun sentenceAt(
         val lines = visibleLines(slice, layout) ?: return@forEachIndexed
         val lineTop = layout.getLineTop(lines.first)
         val height = layout.getLineBottom(lines.last) - lineTop
-        if (position.y >= slice.y && position.y <= slice.y + height) {
-            val offset = layout.getOffsetForPosition(Offset(position.x - left, position.y - slice.y + lineTop))
-            return book.sentenceAtOffset(book.paragraphStarts[slice.paragraph] + offset)
-        }
+        // A press in the space between two paragraphs means the paragraph below it, not nothing at all.
+        if (position.y > slice.y + height) return@forEachIndexed
+        val y = position.y.coerceAtLeast(slice.y)
+        if (y != position.y && i == 0) return null
+        val offset = layout.getOffsetForPosition(Offset(position.x - left, y - slice.y + lineTop))
+        return book.sentenceForTouch(book.paragraphStarts[slice.paragraph] + offset)
     }
     return null
 }
