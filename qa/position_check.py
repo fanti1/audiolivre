@@ -1,17 +1,23 @@
 """Checks, on an Android emulator, that the reading position survives what people do to the app, and that
 "Ler a partir daqui" and leafing through pages put the reading where the reader asked.
 
-    python qa/position_check.py [--avd audiolivre] [--apk app/build/outputs/apk/debug/app-debug.apk]
+    python qa/position_check.py [--avd audiolivre] [--apk app/build/outputs/apk/debug/app-debug.apk] [--repeat 3]
 
-Needs what qa/screenshots.py needs (it borrows its helpers) and a debug APK: the saved position is read straight
-from the app's DataStore file with run-as. Each check prints PASS or FAIL with the numbers behind it; the
-screenshots go to qa/out/position/.
+Needs what qa/screenshots.py needs (it borrows its helpers) and a debuggable APK: the saved position is read
+straight from the app's DataStore file with run-as (to check a release build, build one with isDebuggable and the
+x86_64 libraries). Each check prints PASS or FAIL with the numbers behind it, and --repeat runs everything again
+from a cleared app and sums up; the screenshots go to qa/out/position/.
 
     1. leafing while paused, and coming back to the page, keeps the exact sentence the reading stopped on
-    2. a long press marks the sentence it will read from, and "Ler a partir daqui" reads from it
-    3. turning the phone while it reads keeps reading, and the position never goes back
-    4. the app killed while reading (a dead battery, Android ending it) opens again where the voice was
-    5. "Recomeçar do início" from the shelf while the book is being read sends it to the start for good
+    2. "Frase anterior" after a drag that stayed on the page goes back one sentence
+    3. a long press in the blank line under a chapter title offers to read the chapter's first paragraph
+    4. the "Ler a partir daqui" bubble does not survive a page turn
+    5. a long press marks the sentence it will read from, and "Ler a partir daqui" reads from it
+    6. back on the page being read, the pages follow the voice again
+    7. turning the phone while it reads keeps reading, and the position never goes back
+    8. paused in the background, the notification's and a headset's play buttons resume the reading
+    9. the app killed while reading (a dead battery, Android ending it) opens again where the voice was
+   10. "Recomeçar do início" from the shelf while the book is being read sends it to the start for good
 """
 
 import argparse
